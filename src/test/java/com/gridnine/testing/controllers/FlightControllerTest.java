@@ -3,7 +3,6 @@ package com.gridnine.testing.controllers;
 import com.gridnine.testing.models.Flight;
 import com.gridnine.testing.models.Segment;
 import com.gridnine.testing.services.impl.FlightServiceImpl;
-import com.gridnine.testing.util.FlightBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -80,15 +79,29 @@ class FlightControllerTest {
 
         flightController = new FlightController(new FlightServiceImpl());
 
-        List<Flight> flights = FlightBuilder.createFlights();
+        Segment segment1 = new Segment(LocalDateTime.now().plusHours(3), LocalDateTime.now().plusHours(5));
+        Segment segment2 = new Segment(LocalDateTime.now().plusHours(8), LocalDateTime.now().plusHours(10));
+        Segment segment3 = new Segment(LocalDateTime.now(), LocalDateTime.now().plusHours(1));
 
-        List<Flight> result = flightController.excludeFlightsTakeMoreThanTwoHoursOnGround(flights);
+        Flight badFlight1 = new Flight(List.of(segment1, segment2, segment3));
+        Flight badFlight2 = new Flight(List.of(segment1, segment2));
+        Flight goodFlight = new Flight(List.of(segment3, segment1));
+        Flight goodFlight2 = new Flight(List.of(segment3));
 
-        List<Flight> result2 = flightController.excludeFlightsBeforeCurrentTime(null);
+        List<Flight> result1 = flightController.excludeFlightsTakeMoreThanTwoHoursOnGround(
+                List.of(badFlight1, goodFlight));
 
-        assertEquals(result.size(), 4);
-        assertEquals(result2, new ArrayList<>());
+        List<Flight> result2 = flightController.excludeFlightsTakeMoreThanTwoHoursOnGround(
+                List.of(badFlight2, goodFlight));
 
+        List<Flight> result3 = flightController.excludeFlightsTakeMoreThanTwoHoursOnGround(null);
 
+        List<Flight> result4 = flightController.excludeFlightsTakeMoreThanTwoHoursOnGround(
+                List.of(badFlight1, badFlight2, goodFlight2, goodFlight));
+
+        assertEquals(result1, List.of(goodFlight));
+        assertEquals(result2, List.of(goodFlight));
+        assertEquals(result3, new ArrayList<>());
+        assertEquals(result4, List.of(goodFlight2, goodFlight));
     }
 }

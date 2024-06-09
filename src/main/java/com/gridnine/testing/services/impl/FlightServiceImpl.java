@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class FlightServiceImpl implements FlightService {
 
@@ -21,7 +20,10 @@ public class FlightServiceImpl implements FlightService {
         currentTime = LocalDateTime.now();
     }
 
-
+    /**
+     * @param flights - список полетов
+     * @return - список полетов, который не включает полеты, до текущего времени
+     */
     @Override
     public List<Flight> excludeFlightsBeforeCurrentTime(List<Flight> flights) {
         return Optional.ofNullable(flights).orElse(new ArrayList<>())
@@ -33,24 +35,31 @@ public class FlightServiceImpl implements FlightService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * @param flights - список полетов
+     * @return - список полетов, который не включает полеты, где сегменты с датой
+     * прилета раньше даты вылета
+     */
     @Override
     public List<Flight> excludeSegmentArrivalDateBeforeDepartureDate(List<Flight> flights) {
         return Optional.ofNullable(flights).orElse(new ArrayList<>())
                 .stream()
-                .filter(flight -> checkBadSegments(flight.getSegments()))
+                .filter(flight -> checkingSegmentDepartureDateAfterArrivalDate(flight.getSegments()))
                 .collect(Collectors.toList());
     }
 
 
+    /**
+     *
+     * @param flights - список полетов
+     * @return - список полетов, который не включает полеты, где время проведенное на земле
+     * больше, чем 2 часа. Так же включает перелеты у которых количество сегментов меньше, чем 2.
+     */
     @Override
     public List<Flight> excludeFlightsTakeMoreThanTwoHoursOnGround(List<Flight> flights) {
         return Optional.ofNullable(flights).orElse(new ArrayList<>())
                 .stream()
-                .filter(flight -> IntStream.range(0, flight.getSegments().size() - 1)
-                                          .mapToLong(i -> ChronoUnit.HOURS.between(
-                                                  flight.getSegments().get(i).getArrivalDate(),
-                                                  flight.getSegments().get(i + 1).getDepartureDate()))
-                                          .sum() <= 2)
+                .filter(flight -> !checkingTimeOnEarthIsMoreThanTwoHours(flight.getSegments()))
                 .collect(Collectors.toList());
     }
 
@@ -61,11 +70,29 @@ public class FlightServiceImpl implements FlightService {
      * @return - возвращает true, если список не имеет сегментов,
      * где дата вылета позже даты прилета
      */
-    private boolean checkBadSegments(List<Segment> segments) {
+    private boolean checkingSegmentDepartureDateAfterArrivalDate(List<Segment> segments) {
         for(Segment segment : segments) {
             if (segment.getDepartureDate().isAfter(segment.getArrivalDate()))
                 return false;
         }
         return true;
     }
+
+
+    /**
+     *
+     * @param segments - список сегментов
+     * @return - возвращает true, если разница между временем прибытия текущего сегмента
+     * и вылета следующего больше двух часов
+     */
+    private boolean checkingTimeOnEarthIsMoreThanTwoHours(List<Segment> segments) {
+        for (int i = 0; i < segments.size() -1; i++) {
+            if (ChronoUnit.SECONDS.between(
+                    segments.get(i).getArrivalDate(),
+                    segments.get(i + 1).getDepartureDate()) > 120 * 60)
+                return true;
+        }
+        return false;
+    }
+
 }

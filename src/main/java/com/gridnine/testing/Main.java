@@ -3,11 +3,9 @@ package com.gridnine.testing;
 
 import com.gridnine.testing.controllers.FlightController;
 import com.gridnine.testing.models.Flight;
-import com.gridnine.testing.services.FlightService;
 import com.gridnine.testing.services.impl.FlightServiceImpl;
 import com.gridnine.testing.util.FlightBuilder;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class Main {
@@ -23,7 +21,7 @@ public class Main {
         List<Flight> flights = FlightBuilder.createFlights();
 
 
-        System.out.println("\nСписок всех полетов:\n");
+        System.out.println("\nСписок всех полетов:");
         flights.forEach(System.out::println);
 
         System.out.println("\nСписок полетов, которые не включают полеты," +
