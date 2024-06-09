@@ -77,13 +77,14 @@ public class FlightServiceImpl implements FlightService {
      * и вылета следующего больше двух часов
      */
     private boolean checkingTimeOnEarthIsMoreThanTwoHours(List<Segment> segments) {
+        long result = 0;
+
         for (int i = 0; i < segments.size() -1; i++) {
-            if (ChronoUnit.SECONDS.between(
+            result += ChronoUnit.MINUTES.between(
                     segments.get(i).getArrivalDate(),
-                    segments.get(i + 1).getDepartureDate()) > 120 * 60)
-                return true;
+                    segments.get(i + 1).getDepartureDate());
         }
-        return false;
+        return result > 120;
     }
 
 
