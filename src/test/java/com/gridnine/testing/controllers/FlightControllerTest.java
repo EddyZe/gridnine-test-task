@@ -79,9 +79,12 @@ class FlightControllerTest {
 
         flightController = new FlightController(new FlightServiceImpl());
 
-        Segment segment1 = new Segment(LocalDateTime.now().plusHours(3), LocalDateTime.now().plusHours(5));
-        Segment segment2 = new Segment(LocalDateTime.now().plusHours(8), LocalDateTime.now().plusHours(10));
-        Segment segment3 = new Segment(LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+        Segment segment1 = new Segment(LocalDateTime.now().plusHours(3),
+                LocalDateTime.now().plusHours(5));
+        Segment segment2 = new Segment(LocalDateTime.now().plusHours(8),
+                LocalDateTime.now().plusHours(10));
+        Segment segment3 = new Segment(LocalDateTime.now(),
+                LocalDateTime.now().plusHours(2));
 
         Flight badFlight1 = new Flight(List.of(segment1, segment2, segment3));
         Flight badFlight2 = new Flight(List.of(segment1, segment2));

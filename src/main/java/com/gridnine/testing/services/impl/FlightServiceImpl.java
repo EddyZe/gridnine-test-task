@@ -14,12 +14,6 @@ import java.util.stream.Collectors;
 
 public class FlightServiceImpl implements FlightService {
 
-    private final LocalDateTime currentTime;
-
-    {
-        currentTime = LocalDateTime.now();
-    }
-
     /**
      * @param flights - список полетов
      * @return - список полетов, который не включает полеты, до текущего времени
@@ -28,10 +22,7 @@ public class FlightServiceImpl implements FlightService {
     public List<Flight> excludeFlightsBeforeCurrentTime(List<Flight> flights) {
         return Optional.ofNullable(flights).orElse(new ArrayList<>())
                 .stream()
-                .filter(flight -> flight.getSegments()
-                        .stream()
-                        .anyMatch(segment ->
-                                currentTime.isBefore(segment.getDepartureDate())))
+                .filter(flight -> checkingCurrentDateBeforeDepartureDate(flight.getSegments()))
                 .collect(Collectors.toList());
     }
 
@@ -93,6 +84,22 @@ public class FlightServiceImpl implements FlightService {
                 return true;
         }
         return false;
+    }
+
+
+    /**
+     *
+     * @param segments - список сегментов
+     * @return - возвращает true, если все сегменты идут после текущего времени
+     */
+    private boolean checkingCurrentDateBeforeDepartureDate(List<Segment> segments) {
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        for (Segment segment : segments) {
+            if (currentTime.isAfter(segment.getDepartureDate()))
+                return false;
+        }
+        return true;
     }
 
 }
