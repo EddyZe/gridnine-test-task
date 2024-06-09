@@ -35,8 +35,8 @@ public class Main {
                 .forEach(System.out::println);
 
         System.out.println("\nСписок полетов, который не включает полеты," +
-                           " где проведенное время на земле больше чем 2 часа." +
-                           "Так же в список входят перелеты, где количество сегментов меньше чем 2");
+                           " где общее проведенное время на земле больше чем 2 часа." +
+                           "Так же в список входят перелеты, где количество сегментов меньше чем 2.");
         flightController.excludeFlightsTakeMoreThanTwoHoursOnGround(flights)
                 .forEach(System.out::println);
 
